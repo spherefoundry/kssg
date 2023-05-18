@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kssg"
+authors = [
+    {name = "Antoni Kedracki"},
+]
+description = "Minimalistic static site generator"
+readme = "README.md"
+requires-python = ">=3.11"
+keywords = ["static", "site", "generator", "ssg"]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Utilities"
+]
+dependencies = [
+    "Jinja2==3.1.2",
+    "livereload==2.6.3",
+    "markdown-it-py==2.2.0",
+    "mdit-py-plugins==0.3.5",
+    "pyyaml==6.0",
+]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "kssg.VERSION"}
+
+[project.scripts]
+kssg = "kssg.cli:run"
