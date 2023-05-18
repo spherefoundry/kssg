@@ -11,7 +11,7 @@ at any moment. For the same reason this is not published on PyPi.
 If you decide to use KSSG please consider pinning to a specific version tag. It can be done with `git+https`:  
 
 ```shell
-pip install git+https://https://github.com/spherefoundry/kssg.git@<tag>
+pip install git+https://github.com/spherefoundry/kssg.git@<tag>
 ```
 
 ## Usage
@@ -31,13 +31,13 @@ source <path_to_your_venv>/bin/activate
 Install KSSG
 
 ```shell
-pip install git+https://https://github.com/spherefoundry/kssg.git
+pip install git+https://github.com/spherefoundry/kssg.git
 ```
 
 OR (even better) pin to specific version <tag> 
 
 ```shell
-pip install git+https://https://github.com/spherefoundry/kssg.git@<tag>
+pip install git+https://github.com/spherefoundry/kssg.git@<tag>
 ```
 
 Initialize workspace
