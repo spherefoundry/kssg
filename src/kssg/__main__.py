@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from .config import Config
 from .generator import Generator
 
+
 def command_init():
     config_dict = {
         "src": "src",
@@ -40,7 +41,10 @@ def command_watch(generator: Generator):
 
 
 def run():
-    parser = ArgumentParser(description='Build static site')
+    parser = ArgumentParser(
+        description='Build static site',
+        prog='kssg'
+    )
 
     commands_subparsers = parser.add_subparsers(
         help="Commands",
@@ -106,3 +110,5 @@ def run():
         exit(1)
 
 
+if __name__ == '__main__':
+    run()

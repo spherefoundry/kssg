@@ -33,4 +33,4 @@ dynamic = ["version"]
 version = {attr = "kssg.VERSION"}
 
 [project.scripts]
-kssg = "kssg.cli:run"
+kssg = "kssg.__main__:run"
