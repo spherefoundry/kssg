@@ -1,24 +1,20 @@
 import os
 import shutil
 from dataclasses import asdict
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Sequence, MutableMapping
 
 import yaml
 from jinja2 import Environment
+from markdown_it.renderer import RendererHTML, Token
 from yaml import BaseLoader
 
 from markdown_it import MarkdownIt
+from markdown_it.utils import OptionsDict
 from mdit_py_plugins.front_matter import front_matter_plugin
 
 from .config import Config
 from .context import Context, PostContext
 from .post_filename_parser import PostFilenameParser
-
-
-markdown_lib = (
-    MarkdownIt()
-    .use(front_matter_plugin)
-)
 
 
 class Item:
@@ -67,6 +63,7 @@ class TemplateItem(Item):
 class PostItem(Item):
     def __init__(self, filename: str, config: Config, environment: Environment):
         super().__init__(filename, config, environment)
+        self.md_renderer = self._md_renderer()
 
         basename = os.path.basename(filename)
         name, extension = os.path.splitext(basename)
@@ -85,7 +82,7 @@ class PostItem(Item):
 
     def process(self, context: Context):
         source = self._load_source()
-        content = self._render_content(source)
+        content = self._render_content(source, context)
         post_context = self._extend_context(context, content)
         page = self._render_page(post_context)
         self._save_page(page)
@@ -94,8 +91,11 @@ class PostItem(Item):
         post = next((x for x in context.posts if x.filename == self.filename), None)
         return PostContext.from_context(context, post, content)
 
-    def _render_content(self, markdown: str) -> str:
-        content = markdown_lib.render(markdown)
+    def _render_content(self, markdown: str, context: Context) -> str:
+        raw_content = self.md_renderer.render(markdown)
+        ext_context = self._extend_context(context, "")
+        template = self.environment.from_string(raw_content)
+        content = template.render(asdict(ext_context))
         return content
 
     def _render_page(self, post_context: PostContext) -> str:
@@ -115,7 +115,7 @@ class PostItem(Item):
     def _load_front_matter(self) -> Optional[Dict[str, Any]]:
         source = self._load_source()
 
-        tokens = markdown_lib.parse(source)
+        tokens = self.md_renderer.parse(source)
         for token in tokens:
             if token.type != 'front_matter':
                 continue
@@ -123,6 +123,21 @@ class PostItem(Item):
             return yaml.load(token.content, BaseLoader)
 
         return None
+
+    def _md_renderer(self):
+        def custom_render_fence(
+                renderer: RendererHTML,
+                tokens: Sequence[Token],
+                idx: int,
+                options: OptionsDict,
+                env: MutableMapping
+        ) -> str:
+            return "{% raw %}\n" + renderer.fence(tokens, idx, options, env) + "\n{% endraw %}"
+
+        markdown_lib = MarkdownIt().use(front_matter_plugin)
+        markdown_lib.add_render_rule('fence', custom_render_fence)
+
+        return markdown_lib
 
     @classmethod
     def is_name_valid(cls, name: str) -> bool:
