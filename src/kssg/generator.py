@@ -37,7 +37,10 @@ class Generator:
         posts.sort(key=lambda it: it.date, reverse=True)
 
         context = Context(
-            site=Site(deployment_domain=self.config.deployment_domain),
+            site=Site(
+                title=self.config.site_title,
+                base_url=self.config.site_base_url
+            ),
             posts=posts
         )
 

@@ -8,7 +8,8 @@ from typing import List
 class Config:
     src_path: str
     output_path: str
-    deployment_domain: str
+    site_base_url: str
+    site_title: str = ""
     template_extensions: List[str] = field(default_factory=lambda: ['.html'])
     posts_extensions: List[str] = field(default_factory=lambda: ['.md', '.markdown'])
     post_dir: str = '_posts'
@@ -37,14 +38,15 @@ class Config:
         def get(dst_key: str, src_key: str, required: bool):
             value = data.get(src_key, None)
             if required and value is None:
-                raise Exception(f"Config file is missing a value for ${src_key}")
+                raise Exception(f"Config file is missing a value for {src_key}")
 
             if value is not None:
                 kwargs[dst_key] = value
 
         get("src_path", "src", True)
         get("output_path", "output", True)
-        get("deployment_domain", "domain", True)
+        get("site_title", "title", True)
+        get("site_base_url", "base_url", True)
 
         get("server_host", "serverHost", False)
         get("server_port", "serverPort", False)

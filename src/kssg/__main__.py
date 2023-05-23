@@ -2,6 +2,7 @@ import json
 import os.path
 import sys
 from argparse import ArgumentParser
+import traceback
 
 from .config import Config
 from .generator import Generator
@@ -11,7 +12,8 @@ def command_init():
     config_dict = {
         "src": "src",
         "output": "output",
-        "domain": "https://example.com"
+        "title": "Your Title",
+        "base_url": "https://example.com",
     }
 
     if os.path.exists(Config.workspace_config_file_path()):
@@ -22,6 +24,7 @@ def command_init():
 
     os.makedirs(os.path.join(os.getcwd(), config_dict["src"]), exist_ok=True)
     os.makedirs(os.path.join(os.getcwd(), config_dict["output"]), exist_ok=True)
+
 
 def command_build(generator: Generator):
     generator.build()
@@ -106,7 +109,7 @@ def run():
             generator = Generator(config)
             args.func(generator)
     except Exception as exc:
-        print(exc, file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
         exit(1)
 
 

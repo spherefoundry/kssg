@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, asdict
 from datetime import date
 
 
@@ -23,7 +23,8 @@ class Post:
 
 @dataclass
 class Site:
-    deployment_domain: str
+    title: str
+    base_url: str
 
 
 @dataclass
@@ -31,6 +32,15 @@ class Context:
     site: Site
     posts: [Post]
 
+    def absolute_url(self, input: str) -> str:
+        from urllib.parse import urljoin
+
+        return urljoin(self.site.base_url, input)
+
+    def render_context(self) -> dict:
+        ret = asdict(self)
+        ret['absolute_url'] = lambda input: self.absolute_url(input)
+        return ret
 
 @dataclass
 class PostContext(Context):

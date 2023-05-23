@@ -1,6 +1,5 @@
 import os
 import shutil
-from dataclasses import asdict
 from typing import Dict, Any, Optional, Sequence, MutableMapping
 
 import yaml
@@ -51,7 +50,7 @@ class StaticItem(Item):
 class TemplateItem(Item):
     def process(self, context: Context):
         template = self.environment.get_template(self.filename)
-        page = template.render(asdict(context))
+        page = template.render(context.render_context())
         self._save_page(page)
 
     def _save_page(self, page: str):
@@ -95,12 +94,12 @@ class PostItem(Item):
         raw_content = self.md_renderer.render(markdown)
         ext_context = self._extend_context(context, "")
         template = self.environment.from_string(raw_content)
-        content = template.render(asdict(ext_context))
+        content = template.render(ext_context.render_context())
         return content
 
     def _render_page(self, post_context: PostContext) -> str:
         template = self.environment.get_template('_post.html')
-        page = template.render(asdict(post_context))
+        page = template.render(post_context.render_context())
         return page
 
     def _save_page(self, page: str):
