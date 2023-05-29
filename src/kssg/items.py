@@ -10,6 +10,7 @@ from yaml import BaseLoader
 from markdown_it import MarkdownIt
 from markdown_it.utils import OptionsDict
 from mdit_py_plugins.front_matter import front_matter_plugin
+from mdit_py_plugins.anchors import anchors_plugin
 
 from .config import Config
 from .context import Context, PostContext
@@ -133,7 +134,9 @@ class PostItem(Item):
         ) -> str:
             return "{% raw %}\n" + renderer.fence(tokens, idx, options, env) + "\n{% endraw %}"
 
-        markdown_lib = MarkdownIt().use(front_matter_plugin)
+        markdown_lib = MarkdownIt() \
+            .use(front_matter_plugin) \
+            .use(anchors_plugin)
         markdown_lib.add_render_rule('fence', custom_render_fence)
 
         return markdown_lib
