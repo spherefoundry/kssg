@@ -1,3 +1,4 @@
+import functools
 import os
 import shutil
 
@@ -34,7 +35,20 @@ class Generator:
             if isinstance(item, PostItem):
                 posts.append(Post.from_post_item(item))
 
-        posts.sort(key=lambda it: it.date, reverse=True)
+        def post_sort(a: Post, b: Post) -> int:
+            if a.date < b.date:
+                return -1
+            elif a.date > b.date:
+                return 1
+            else:
+                if a.order < b.order:
+                    return -1
+                elif a.order > b.order:
+                    return 1
+                else:
+                    return 0
+
+        posts.sort(key=functools.cmp_to_key(post_sort), reverse=True)
 
         context = Context(
             site=Site(

@@ -75,6 +75,7 @@ class PostItem(Item):
 
         self.title = front_matter["title"]
         self.short = front_matter["short"]
+        self.order = int(front_matter.get("order", "0"))
 
     @property
     def dst_path(self) -> str:
