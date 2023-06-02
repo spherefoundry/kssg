@@ -71,11 +71,11 @@ class PostItem(Item):
         self.link = transformer.link
         self.date = transformer.date
 
-        front_matter = self._load_front_matter()
+        self.front_matter = self._load_front_matter()
 
-        self.title = front_matter["title"]
-        self.short = front_matter["short"]
-        self.order = int(front_matter.get("order", "0"))
+        self.title = self.front_matter["title"]
+        self.short = self.front_matter["short"]
+        self.order = int(self.front_matter.get("order", "0"))
 
     @property
     def dst_path(self) -> str:

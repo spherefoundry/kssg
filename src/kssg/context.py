@@ -10,6 +10,7 @@ class Post:
     link: str
     date: date
     order: int
+    front_matter: [any]
 
     @classmethod
     def from_post_item(cls, item: 'PostItem') -> 'Post':
@@ -19,7 +20,8 @@ class Post:
             short=item.short,
             link=item.link,
             date=item.date,
-            order=item.order
+            order=item.order,
+            front_matter=item.front_matter
         )
 
 
