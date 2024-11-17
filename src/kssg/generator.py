@@ -5,8 +5,8 @@ import shutil
 from jinja2 import Environment, select_autoescape, FileSystemLoader
 
 from .config import Config
-from .context import Post, Context, Site
-from .items import IgnoreItem, StaticItem, TemplateItem, PostItem, Item
+from .context import Context, Site, Page, PageList
+from .items import IgnoreItem, StaticItem, HTMLPageItem, JsonPageItem, Item
 
 
 class Generator:
@@ -24,7 +24,7 @@ class Generator:
 
     def build(self):
         items: [Item] = []
-        posts: [Post] = []
+        pages: [Page] = []
 
         # FileSystemLoader doesn't have the knowledge necessary to distinguish between templates and non-template,
         # and so yields all files. It's up to us to decide what to do with them.
@@ -32,33 +32,22 @@ class Generator:
             item = self.classify_file(file_name)
             items.append(item)
 
-            if isinstance(item, PostItem):
-                posts.append(Post.from_post_item(item))
-
-        def post_sort(a: Post, b: Post) -> int:
-            if a.date < b.date:
-                return -1
-            elif a.date > b.date:
-                return 1
-            else:
-                if a.order < b.order:
-                    return -1
-                elif a.order > b.order:
-                    return 1
-                else:
-                    return 0
-
-        posts.sort(key=functools.cmp_to_key(post_sort), reverse=True)
+            if (page := item.page) is not None:
+                pages.append(page)
 
         context = Context(
             site=Site(
                 title=self.config.site_title,
                 base_url=self.config.site_base_url
             ),
-            posts=posts
+            pages=PageList(pages)
         )
 
         for item in items:
+            if (page := item.page) is not None:
+                context.page = page
+            else:
+                context.page = None
             item.process(context)
 
     def watch(self):
@@ -91,18 +80,14 @@ class Generator:
     def classify_file(self, filename: str) -> Item:
         basename = os.path.basename(filename)
         name, extension = os.path.splitext(basename)
-        dirname = os.path.dirname(filename)
 
         if basename.startswith("_"):
             return IgnoreItem(filename, self.config, self.environment)
 
-        if dirname.startswith(self.config.post_dir):
-            if PostItem.is_name_valid(name) and extension in self.config.posts_extensions:
-                return PostItem(filename, self.config, self.environment)
-            else:
-                return IgnoreItem(filename, self.config, self.environment)
+        if extension in self.config.html_page_extensions:
+            return HTMLPageItem(filename, self.config, self.environment)
 
-        if extension in self.config.template_extensions:
-            return TemplateItem(filename, self.config, self.environment)
+        if extension in self.config.json_page_extensions:
+            return JsonPageItem(filename, self.config, self.environment)
 
         return StaticItem(filename, self.config, self.environment)

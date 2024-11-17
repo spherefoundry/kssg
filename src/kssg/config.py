@@ -10,8 +10,8 @@ class Config:
     output_path: str
     site_base_url: str
     site_title: str = ""
-    template_extensions: List[str] = field(default_factory=lambda: ['.html'])
-    posts_extensions: List[str] = field(default_factory=lambda: ['.md', '.markdown'])
+    html_page_extensions: List[str] = field(default_factory=lambda: ['.html'])
+    json_page_extensions: List[str] = field(default_factory=lambda: ['.jpt'])
     post_dir: str = '_posts'
     server_host: str = 'localhost'
     server_port: int = 8001
@@ -45,8 +45,11 @@ class Config:
 
         get("src_path", "src", True)
         get("output_path", "output", True)
-        get("site_title", "title", True)
         get("site_base_url", "base_url", True)
+        get("site_title", "title", True)
+
+        get("html_page_extensions", "htmlPageExtensions", False)
+        get("json_page_extensions", "jsonPageExtensions", False)
 
         get("server_host", "serverHost", False)
         get("server_port", "serverPort", False)
